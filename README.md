@@ -9,7 +9,7 @@
 
 ### Read deeper. Spoil nothing. Share nothing.
 
-**A privacy-first, offline-capable AI reading companion that lives on your machine, not in someone else's cloud.**
+**A privacy-first, offline-capable AI reading companion that runs on your machine, not in someone else's cloud.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](CONTRIBUTING.md)
@@ -29,27 +29,25 @@
 
 > _"I just want to ask a question about the chapter I'm on, without the app telling me how the book ends."_
 
-`book.ai` was built **for a friend**. She loves reading, and she was tired of three things:
+Built for a friend who loves reading, `book.ai` solves three problems with general-purpose chatbots:
 
-- 🔒 **Privacy:** every question about a book is a window into what you think, feel, and wonder about. She didn't want her reading habits sent to a corporate cloud server.
-- 🙈 **Spoilers:** general-purpose chatbots happily reveal the ending when you only asked about chapter three.
-- 📴 **Access and cost:** she wanted something that works without a subscription, and without a connection.
-
-So we built the reading companion we wanted: a quiet, distraction-free app where a language model runs **entirely on your own computer**, knows exactly where you are in the book, and keeps its mouth shut about what comes next.
+- 🔒 **Privacy:** your questions reveal what you think and feel. They stay on your machine.
+- 🙈 **Spoilers:** ask about chapter three and get chapter three, not the ending.
+- 📴 **Access:** no subscription, and no connection required.
 
 ---
 
 ## ✨ Key Features
 
-- 🧠 **Local-first AI.** Google's `gemma2:2b` runs through [Ollama](https://ollama.com) on your own hardware. Your questions and your reading history never leave your machine.
-- 📖 **Book exploration.** Type any book title and get an instant overview: author, summary, and a chapter-by-chapter breakdown.
-- 🛡️ **Spoiler-free Read Mode.** Tap a chapter and chat about it. The AI is instructed to discuss only what has happened up to the end of that chapter, and to politely decline to reveal what comes later.
-- 🎧 **Audio narration (new!).** Listen to the AI's answers read aloud with natural-sounding text-to-speech powered by the [ElevenLabs](https://elevenlabs.io) API.
-- 💾 **Smart caching.** Generated book overviews are saved in a local MongoDB, so the second visit to a book is instant.
-- ✍️ **Beautifully rendered answers.** Responses support Markdown (bold, lists, and more) and are shown in a warm, paper-toned reading interface.
-- 🐳 **One-command infrastructure.** MongoDB and Ollama start together with Docker Compose.
+- 🧠 **Local-first AI:** Google's `gemma2:2b` runs through [Ollama](https://ollama.com) on your hardware.
+- 📖 **Book exploration:** enter a title for the author, summary, and chapter breakdown.
+- 🛡️ **Spoiler-free Read Mode:** chat about a chapter; the AI discusses only what happened up to it.
+- 🎧 **Audio narration:** hear answers read aloud via [ElevenLabs](https://elevenlabs.io) text-to-speech.
+- 💾 **Smart caching:** overviews are stored in local MongoDB, so repeat visits are instant.
+- ✍️ **Clean reading UI:** Markdown-rendered answers in a warm, paper-toned interface.
+- 🐳 **One-command infrastructure:** MongoDB and Ollama start together with Docker Compose.
 
-> [!NOTE] > **About privacy and audio.** Everything in book.ai runs locally **except** audio narration. When you tap the listen button, the text of that single AI answer is sent to ElevenLabs to be converted into speech. Narration is optional, and the rest of the app works fully offline without it.
+> [!NOTE] > **Privacy and audio:** everything runs locally **except** narration. Tapping the listen button sends that single answer's text to ElevenLabs. Narration is optional; the rest of the app works fully offline.
 
 ---
 
@@ -74,16 +72,16 @@ flowchart LR
 
 ### API at a glance
 
-| Method | Endpoint            | Body                                 | Response                                 |
-| :----- | :------------------ | :----------------------------------- | :--------------------------------------- |
-| `POST` | `/api/book/explore` | `{ "title": "Book Name" }`           | `{ title, author, summary, chapters[] }` |
-| `POST` | `/api/book/read`    | `{ "title", "chapter", "question" }` | `{ "answer": "markdown string" }`        |
+| Method             | Endpoint                 | Body                     | Response                   |
+| :----------------- | :----------------------- | :----------------------- | :------------------------- |
+| `YOUR_METHOD_HERE` | `YOUR_NEW_ENDPOINT_HERE` | `YOUR_REQUEST_BODY_HERE` | `YOUR_RESPONSE_SHAPE_HERE` |
+| `YOUR_METHOD_HERE` | `YOUR_NEW_ENDPOINT_HERE` | `YOUR_REQUEST_BODY_HERE` | `YOUR_RESPONSE_SHAPE_HERE` |
 
 ---
 
 ## 🚀 Local Setup Guide
 
-Get book.ai running on your machine in about ten minutes (most of it is the model download).
+Get book.ai running in about ten minutes (most of it is the model download).
 
 ### ✅ Prerequisites
 
@@ -174,21 +172,21 @@ Expo will open book.ai in your browser (usually at **http://localhost:8081**). S
 
 <br>
 
-A 2B model should answer in seconds on modern hardware. If you only get a few tokens per second, the model is probably running on the CPU.
+The model is probably running on CPU.
 
-- **macOS:** Docker on a Mac cannot use the GPU, so the Ollama container runs on CPU only. For much faster responses, install the [native Ollama app](https://ollama.com/download), stop the `local_ollama` container, and pull the model with `ollama pull gemma2:2b`. The backend talks to `http://127.0.0.1:11434` either way.
-- **Linux with NVIDIA:** enable GPU access for the container with the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html).
-- **Check what is happening:** `docker exec -it local_ollama ollama ps` shows whether the model is loaded and which processor it uses.
-- **Smaller model:** pull a lighter model and set `OLLAMA_MODEL` in `backend/.env`.
+- **macOS:** Docker can't use the Mac GPU. Install the [native Ollama app](https://ollama.com/download), stop the `local_ollama` container, and run `ollama pull gemma2:2b`. The backend reaches `http://127.0.0.1:11434` either way.
+- **Linux with NVIDIA:** enable GPU access via the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html).
+- **Diagnose:** `docker exec -it local_ollama ollama ps` shows whether the model is loaded and on which processor.
+- **Lighter model:** pull a smaller model and set `OLLAMA_MODEL` in `backend/.env`.
 
 </details>
 
 <details>
-<summary><b>🚫 The browser shows a network or CORS error</b></summary>
+<summary><b>🚫 Network or CORS error in the browser</b></summary>
 
 <br>
 
-Make sure the backend is running on port `5001` and that CORS is enabled on the Express app (`app.use(cors())`).
+Confirm the backend is running on port `5001` and CORS is enabled (`app.use(cors())`).
 
 </details>
 
@@ -197,7 +195,7 @@ Make sure the backend is running on port `5001` and that CORS is enabled on the 
 
 <br>
 
-You skipped Step 3, or the model name does not match. Run `docker exec -it local_ollama ollama list` and confirm `gemma2:2b` is listed.
+Run `docker exec -it local_ollama ollama list` and confirm `gemma2:2b` is listed. If not, repeat Step 3.
 
 </details>
 
@@ -206,7 +204,7 @@ You skipped Step 3, or the model name does not match. Run `docker exec -it local
 
 <br>
 
-Check that `ELEVENLABS_API_KEY` is set in `backend/.env`, restart the backend, and make sure your machine has an internet connection (narration is the one feature that needs it).
+Check that `ELEVENLABS_API_KEY` is set in `backend/.env`, restart the backend, and confirm you're online (narration is the only feature that needs internet).
 
 </details>
 
@@ -214,21 +212,21 @@ Check that `ELEVENLABS_API_KEY` is set in `backend/.env`, restart the backend, a
 
 ## 🤝 Contributing
 
-Contributions are what make open source great, and **PRs are very welcome**, especially this October. 🍂
+PRs are very welcome, especially this October. 🍂
 
 1. 🍴 Fork the repository
-2. 🌿 Create your feature branch: `git checkout -b feature/amazing-idea`
-3. 💾 Commit your changes: `git commit -m "Add amazing idea"`
-4. 📤 Push to the branch: `git push origin feature/amazing-idea`
+2. 🌿 Create a branch: `git checkout -b feature/amazing-idea`
+3. 💾 Commit: `git commit -m "Add amazing idea"`
+4. 📤 Push: `git push origin feature/amazing-idea`
 5. 🔃 Open a Pull Request
 
-Look for issues labeled [`good first issue`](../../issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) and [`hacktoberfest`](../../issues?q=is%3Aissue+is%3Aopen+label%3Ahacktoberfest) to get started.
+Browse [`good first issue`](../../issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) and [`hacktoberfest`](../../issues?q=is%3Aissue+is%3Aopen+label%3Ahacktoberfest) issues to get started.
 
-**Ideas we would love help with:**
+**Ideas we'd love help with:**
 
-- 🌍 Support for more local models and a model picker
-- 📚 Importing a reader's own EPUB or PDF for chapter-aware answers
-- 🔖 Saving reading progress and conversation history
+- 🌍 More local models and a model picker
+- 📚 Import your own EPUB or PDF for chapter-aware answers
+- 🔖 Saved reading progress and conversation history
 - 🗣️ A fully offline text-to-speech option
 - 📱 Native iOS and Android builds
 
@@ -238,13 +236,12 @@ Look for issues labeled [`good first issue`](../../issues?q=is%3Aissue+is%3Aopen
 
 > **Challenge:** _Build for a Friend_
 
-book.ai was created for the **Build for a Friend** challenge: a real tool for a real person with a real problem. It brings together:
+A real tool for a real person with a real problem.
 
-|     | Technology     | How it is used                                                                                                    |
-| :-: | :------------- | :---------------------------------------------------------------------------------------------------------------- |
-| 💎  | **Gemma**      | Google's `gemma2:2b` powers book overviews and spoiler-free chapter conversations, running locally through Ollama |
-| ☁️  | **Render**     | Hosting and deployment                                                                                            |
-| 🎙️  | **ElevenLabs** | Natural text-to-speech narration of the AI's answers                                                              |
+|     | Technology     | How it is used                                                                                       |
+| :-: | :------------- | :--------------------------------------------------------------------------------------------------- |
+| 💎  | **Gemma**      | Google's `gemma2:2b` powers book overviews and spoiler-free chapter chat, running locally via Ollama |
+| 🎙️  | **ElevenLabs** | Natural text-to-speech narration of the AI's answers                                                 |
 
 ---
 
