@@ -21,6 +21,14 @@
 ![Ollama](https://img.shields.io/badge/Ollama-Gemma_2_2B-000000?logo=ollama&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)
 
+<br>
+
+<a href="https://youtu.be/sBKbTY0pKis">
+  <img src="frontend/assets/demo-thumbnail.png" alt="Watch the book.ai demo walkthrough on YouTube" width="240">
+</a>
+<br>
+<sub><a href="https://youtu.be/sBKbTY0pKis"><b>▶ Watch the 5-min demo walkthrough</b></a></sub>
+
 </div>
 
 ---
