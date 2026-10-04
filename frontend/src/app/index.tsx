@@ -134,7 +134,29 @@ function ReadModal({ book, chapter, onClose }: { book: Book; chapter: Chapter | 
   const [question, setQuestion] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [asking, setAsking] = useState(false);
+  const [playingId, setPlayingId] = useState<string | null>(null);
   const scroller = useRef<ScrollView>(null);
+
+  const playAudio = async (text: string, id: string) => {
+    if (playingId) return;
+    setPlayingId(id);
+    try {
+      const res = await fetch(`${API}/tts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      
+      if (!res.ok) throw new Error('Audio fetch failed');
+      
+      const blob = await res.blob();
+      const audio = new Audio(URL.createObjectURL(blob));
+      audio.onended = () => setPlayingId(null);
+      audio.play();
+    } catch (e) {
+      setPlayingId(null);
+    }
+  };
 
   useEffect(() => {
     setQuestion('');
@@ -213,6 +235,11 @@ function ReadModal({ book, chapter, onClose }: { book: Book; chapter: Chapter | 
                 ) : (
                   <View key={m.id} style={[styles.bubbleAi, shadow(0.06, 10, 3), m.error && { borderColor: C.danger }]}>
                     {m.error ? <Text style={[styles.mdText, { color: C.danger }]}>{m.text}</Text> : <Markdown text={m.text} />}
+                    {!m.error && (
+                      <TouchableOpacity onPress={() => playAudio(m.text, m.id)} style={styles.playBtn}>
+                        <Text style={styles.playBtnText}>{playingId === m.id ? '🔊 Playing...' : '🔈 Read Aloud'}</Text>
+                      </TouchableOpacity>
+                    )}
                   </View>
                 )
               )}
@@ -446,6 +473,8 @@ const styles = StyleSheet.create({
   bubbleUser: { alignSelf: 'flex-end', maxWidth: '85%', backgroundColor: C.accent, borderRadius: 20, borderBottomRightRadius: 6, paddingHorizontal: 16, paddingVertical: 12, marginBottom: 14 },
   bubbleUserText: { fontFamily: SERIF, fontSize: 16, lineHeight: 23, color: '#FFF' },
   bubbleAi: { alignSelf: 'flex-start', maxWidth: '92%', backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: 20, borderBottomLeftRadius: 6, paddingHorizontal: 18, paddingVertical: 14, marginBottom: 14 },
+  playBtn: { marginTop: 12, alignSelf: 'flex-start', backgroundColor: C.sunken, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12 },
+  playBtnText: { fontFamily: SANS, fontSize: 13, color: C.inkSoft, fontWeight: '600' },
 
   composer: { flexDirection: 'row', alignItems: 'flex-end', padding: 14, paddingBottom: Platform.OS === 'ios' ? 28 : 14, borderTopWidth: 1, borderTopColor: C.line, backgroundColor: C.paper },
   composerInput: { flex: 1, minHeight: 48, maxHeight: 120, backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: 14, paddingHorizontal: 16, paddingTop: 13, paddingBottom: 13, fontFamily: SERIF, fontSize: 16, color: C.ink, marginRight: 10 },

@@ -114,3 +114,37 @@ export const readBook = async (req: Request, res: Response) => {
     return sendError(res, error, 'Failed to chat with AI');
   }
 };
+
+export const generateAudio = async (req: Request, res: Response) => {
+  try {
+    const text = str(req.body?.text);
+    if (!text) return res.status(400).json({ error: 'Text is required' });
+
+    const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'xi-api-key': process.env.ELEVENLABS_API_KEY || '',
+      },
+      body: JSON.stringify({
+        text: text.replace(/[*#`_]/g, ''),
+        model_id: 'eleven_multilingual_v2',
+      }),
+    });
+
+    if (!response.ok) {
+      const errDetail = await response.text();
+      console.error('ElevenLabs Rejected Request:', response.status, errDetail);
+      throw new Error('ElevenLabs API error');
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    res.set('Content-Type', 'audio/mpeg');
+    res.send(buffer);
+  } catch (error) {
+    console.error('Audio Error:', error);
+    res.status(500).json({ error: 'Failed to generate audio' });
+  }
+};
